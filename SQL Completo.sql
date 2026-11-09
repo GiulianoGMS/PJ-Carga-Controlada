@@ -50,7 +50,8 @@ BEGIN
     INTO psIndExisteCargaPendente
     FROM NAGT_CONTROLE_CARGA_PDV X 
    WHERE X.EMPUSUARIO = psNroEmpresaUsuario
-     AND X.GRUPO = psIndLojaMatriz;
+     AND X.GRUPO = psIndLojaMatriz
+     AND X.STATUS = 0;
   
   IF psIndExisteCargaPendente = 0 THEN -- Se 0 segue
     
@@ -167,7 +168,7 @@ SELECT 'Carga solicitada com sucesso!' STATUS FROM DUAL
 -- Lojas (Usuario nao seleciona a loja, é validado  pelo cadastro
 
 SELECT 1 A FROM DUAL;
-EXECUTE NAGP_CONTROLE_CARGA_PDV(0, 'X', 'X');
+EXECUTE NAGP_CONTROLE_CARGA_PDV('999', 'X', 'X');
 
 SELECT 'Carga solicitada com sucesso!' STATUS FROM DUAL
 
