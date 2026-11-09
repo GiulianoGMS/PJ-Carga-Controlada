@@ -31,7 +31,8 @@ BEGIN
     INTO psIndExisteCargaPendente
     FROM NAGT_CONTROLE_CARGA_PDV X 
    WHERE X.EMPUSUARIO = psNroEmpresaUsuario
-     AND X.GRUPO = psIndLojaMatriz;
+     AND X.GRUPO = psIndLojaMatriz
+     AND X.STATUS = 0;
   
   IF psIndExisteCargaPendente = 0 THEN -- Se 0 segue
     
