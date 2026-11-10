@@ -8,53 +8,54 @@ CREATE OR REPLACE PROCEDURE NAGP_CONTROLE_CARGA_PDV (psLojaCarga VARCHAR2, psTip
    -- psIndLojaMatriz VARCHAR2(10);
    psCodUsuario VARCHAR2(4000);
    psEmpCarga NUMBER(3);
-   
+
    pdTipoCargaPDV VARCHAR2(1);
    pdTipoCargaBAL VARCHAR2(1);
 
 BEGIN
-  
+
   -- Descobre o usuario
   SELECT NVL(SYS_CONTEXT ('USERENV','CLIENT_IDENTIFIER'), 'CONSINCO')
     INTO psCodUsuario
     FROM DUAL;
-  
+
   --Descobre a empresa do usuario
   SELECT MAX(NROEMPRESA)
     INTO psNroEmpresaUsuario
-    FROM GE_USUARIO G 
+    FROM GE_USUARIO G
    WHERE G.CODUSUARIO = psCodUsuario;
-  
+
   IF psNroEmpresaUsuario IS NOT NULL THEN -- Se encontrou segue
-    
-  SELECT COUNT(1) -- Valida se nao foi solicitado carga anteriormente e que ainda nao foi processada, para nao duplicar comando
-    INTO psIndExisteCargaPendente
-    FROM NAGT_CONTROLE_CARGA_PDV X 
-   WHERE X.EMPUSUARIO = psNroEmpresaUsuario
-     AND X.GRUPO = psIndLojaMatriz
-     AND X.STATUS = 0;
-  
-  IF psIndExisteCargaPendente = 0 THEN -- Se 0 segue
     
   -- Trata loja de carga
   IF psLojaCarga = '999' THEN
      psEmpCarga := psNroEmpresaUsuario;
-  ELSE 
+  ELSE
      psEmpCarga := psLojaCarga;
   END IF;
-  
+
+  SELECT COUNT(1) -- Valida se nao foi solicitado carga anteriormente e que ainda nao foi processada, para nao duplicar comando
+    INTO psIndExisteCargaPendente
+    FROM NAGT_CONTROLE_CARGA_PDV X
+   WHERE X.EMPUSUARIO = psNroEmpresaUsuario
+     AND X.EMPCARGA = psLojaCarga
+     AND X.GRUPO = psIndLojaMatriz
+     AND X.STATUS = 0;
+
+  IF psIndExisteCargaPendente = 0 THEN -- Se 0 segue
+
   -- Trata tipo de cargas
   IF psTipoCargaPDV = 'Sim' THEN
           pdTipoCargaPDV := 'S';
      ELSE pdTipoCargaPDV := 'N';
-     
+
   END IF;
-  
+
   IF psTipoCargaBAL = 'Sim' THEN
           pdTipoCargaBAL := 'S';
      ELSE pdTipoCargaBAL := 'N';
   END IF;
-  
+
   -- Faz o insert do start
      INSERT INTO NAGT_CONTROLE_CARGA_PDV (DTALOG,
                                           USUARIOLOG,
@@ -65,12 +66,12 @@ BEGIN
                                           TIPOCARGA_BAL,
                                           STATUS,
                                           DTAPROCESSO, SEQPROCESSO)
-                                          
+
            VALUES (SYSDATE, psCodUsuario, psNroEmpresaUsuario, psEmpCarga, psIndLojaMatriz, pdTipoCargaPDV, pdTipoCargaBAL, 0, NULL, NULL);
-  
+
   COMMIT;
-  
+
   END IF;
   END IF;
-  
+
 END;
