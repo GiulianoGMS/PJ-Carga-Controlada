@@ -1,11 +1,11 @@
-CREATE OR REPLACE PROCEDURE NAGP_CONTROLE_CARGA_PDV (psLojaCarga VARCHAR2, psTipoCargaPDV VARCHAR2, psTipoCargaBAL VARCHAR2) IS
+CREATE OR REPLACE PROCEDURE NAGP_CONTROLE_CARGA_PDV (psLojaCarga VARCHAR2, psTipoCargaPDV VARCHAR2, psTipoCargaBAL VARCHAR2, psIndLojaMatriz VARCHAR2) IS
 
    -- Versao LOJA   psLojaCarga := 0, psTipoCargaPDV := X, psTipoCargaBAL := X
    -- Versao MATRIZ psLojaCarga := :LS1, psTipoCargaPDV := :LS2, psTipoCargaBAL := :LS3
 
    psNroEmpresaUsuario NUMBER(3);
    psIndExisteCargaPendente NUMBER(10);
-   psIndLojaMatriz VARCHAR2(10);
+   -- psIndLojaMatriz VARCHAR2(10);
    psCodUsuario VARCHAR2(4000);
    psEmpCarga NUMBER(3);
    
@@ -20,8 +20,8 @@ BEGIN
     FROM DUAL;
   
   --Descobre a empresa do usuario
-  SELECT MAX(NROEMPRESA), CASE WHEN MAX(NROEMPRESA) < 500 THEN 'L' ELSE 'M' END
-    INTO psNroEmpresaUsuario, psIndLojaMatriz
+  SELECT MAX(NROEMPRESA)
+    INTO psNroEmpresaUsuario
     FROM GE_USUARIO G 
    WHERE G.CODUSUARIO = psCodUsuario;
   
