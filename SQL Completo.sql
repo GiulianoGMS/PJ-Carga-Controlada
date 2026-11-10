@@ -1,6 +1,7 @@
 -- Tabela de Controle 
-
-CREATE TABLE NAGT_CONTROLE_CARGA_PDV (DTALOG DATE, USUARIOLOG VARCHAR2(4000), EMPUSUARIO NUMBER(3), EMPCARGA NUMBER(3), GRUPO VARCHAR2(10), TIPOCARGA_PDV VARCHAR2(1), TIPOCARGA_BAL VARCHAR2(1), STATUS NUMBER(3), DTAPROCESSO DATE, SEQPROCESSO NUMBER(10));
+CREATE TABLE NAGT_CONTROLE_CARGA_PDV (DTALOG DATE, USUARIOLOG VARCHAR2(4000), EMPUSUARIO NUMBER(3), EMPCARGA NUMBER(3), 
+                                      GRUPO VARCHAR2(10), TIPOCARGA_PDV VARCHAR2(1), TIPOCARGA_BAL VARCHAR2(1), 
+                                      STATUS NUMBER(3), DTAPROCESSO DATE, SEQPROCESSO NUMBER(10), IND_PROCWTS NUMBER(1));
 
 -- Sequencial para processo futuro
 
@@ -17,14 +18,14 @@ CREATE TABLE NAGT_EMP_ESPECIAL (NROEMPRESA NUMBER(3));
 
 -- Proc de gravação de envio de solicitacao/start da carga
 
-CREATE OR REPLACE PROCEDURE NAGP_CONTROLE_CARGA_PDV (psLojaCarga VARCHAR2, psTipoCargaPDV VARCHAR2, psTipoCargaBAL VARCHAR2) IS
+CREATE OR REPLACE PROCEDURE NAGP_CONTROLE_CARGA_PDV (psLojaCarga VARCHAR2, psTipoCargaPDV VARCHAR2, psTipoCargaBAL VARCHAR2, psIndLojaMatriz VARCHAR2) IS
 
    -- Versao LOJA   psLojaCarga := 0, psTipoCargaPDV := X, psTipoCargaBAL := X
    -- Versao MATRIZ psLojaCarga := :LS1, psTipoCargaPDV := :LS2, psTipoCargaBAL := :LS3
 
    psNroEmpresaUsuario NUMBER(3);
    psIndExisteCargaPendente NUMBER(10);
-   psIndLojaMatriz VARCHAR2(10);
+   -- psIndLojaMatriz VARCHAR2(10);
    psCodUsuario VARCHAR2(4000);
    psEmpCarga NUMBER(3);
    
@@ -39,8 +40,8 @@ BEGIN
     FROM DUAL;
   
   --Descobre a empresa do usuario
-  SELECT MAX(NROEMPRESA), CASE WHEN MAX(NROEMPRESA) < 500 THEN 'L' ELSE 'M' END
-    INTO psNroEmpresaUsuario, psIndLojaMatriz
+  SELECT MAX(NROEMPRESA)
+    INTO psNroEmpresaUsuario
     FROM GE_USUARIO G 
    WHERE G.CODUSUARIO = psCodUsuario;
   
@@ -93,8 +94,6 @@ BEGIN
   END IF;
   
 END;
-
-
 
 -- Rotina de geracao de carga
 
@@ -161,14 +160,14 @@ BEGIN
 -- Matriz:
 
 SELECT 1 A FROM DUAL;
-EXECUTE NAGP_CONTROLE_CARGA_PDV(#LS1, #LS2, #LS3);
+EXECUTE NAGP_CONTROLE_CARGA_PDV(#LS1, #LS2, #LS3, 'M');
 
 SELECT 'Carga solicitada com sucesso!' STATUS FROM DUAL
   
 -- Lojas (Usuario nao seleciona a loja, é validado  pelo cadastro
 
 SELECT 1 A FROM DUAL;
-EXECUTE NAGP_CONTROLE_CARGA_PDV('999', 'X', 'X');
+EXECUTE NAGP_CONTROLE_CARGA_PDV('999', 'X', 'X', 'L');
 
 SELECT 'Carga solicitada com sucesso!' STATUS FROM DUAL
 
